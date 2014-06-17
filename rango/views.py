@@ -3,6 +3,7 @@ from django.template import RequestContext
 from django.shortcuts import render_to_response
 
 from .models import Category
+from .models import Page
 
 def index(request):
     context = RequestContext(request)
@@ -17,3 +18,26 @@ def about(request):
     context = RequestContext(request)
     
     return render_to_response('rango/about.html', context_dict, context)
+
+
+def category(request, category_name_url):
+    context = RequestContext(request)
+    
+    category_name = category_name_url.replace('_', ' ')
+    
+    context_dict = {'category_name': category_name}
+    
+    try:
+    
+        category = Category.objects.get(name=category_name)
+    
+        pages = Page.objects.filter(category=category)
+    
+        context_dict['pages'] = pages
+    
+        context_dict['category'] = category
+        
+    except Category.DoesNotExist:
+        
+        pass
+    return render_to_response('rango/category.html', context_dict, context)
